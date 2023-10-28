@@ -65,3 +65,15 @@ export const getUserByWalletAddress = async (walletAddress: string) => {
     throw new Error(error);
   }
 };
+
+export const loginUser = async (username: string, password: string) => {
+  try {
+    const user = await getUserByUsername(username);
+    if (!user) throw new Error("User not found");
+    const isPasswordMatch = await comparePassword(password, user[0].password);
+    if (!isPasswordMatch) throw new Error("Password is not correct");
+    return user;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};

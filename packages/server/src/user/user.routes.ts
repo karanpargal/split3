@@ -4,6 +4,7 @@ import {
   updateUserById,
   deleteUserById,
   getUserByWalletAddress,
+  loginUser,
 } from "./user.service";
 import { Request, Response, Router } from "express";
 import { hashPassword } from "../utils/bcrypt";
@@ -32,7 +33,7 @@ const handleGetUserByUsername = async (req: Request, res: Response) => {
         .status(400)
         .json({ success: false, error: "Please provide username" });
     const user = await getUserByUsername(username);
-    if (!user)
+    if (user.length === 0)
       return res.status(404).json({ success: false, error: "User not found" });
     res.status(200).json({ success: true, user });
   } catch (error: any) {
@@ -49,11 +50,11 @@ const handleUpdateUserById = async (req: Request, res: Response) => {
         .status(400)
         .json({ success: false, error: "Please provide id" });
 
-    if(password){
+    if (password) {
       password = await hashPassword(password);
     }
     const user = await updateUserById(id, walletAddress, username, password);
-    if (!user)
+    if (user.length === 0)
       return res.status(404).json({ success: false, error: "User not found" });
     res.status(200).json({ success: true, user });
   } catch (error: any) {
@@ -69,7 +70,7 @@ const handleDeleteUserById = async (req: Request, res: Response) => {
         .status(400)
         .json({ success: false, error: "Please provide id" });
     const user = await deleteUserById(id);
-    if (!user)
+    if (user.length === 0)
       return res.status(404).json({ success: false, error: "User not found" });
     res.status(200).json({ success: true, user });
   } catch (error: any) {
@@ -85,7 +86,26 @@ const handleGetUserByWalletAddress = async (req: Request, res: Response) => {
         .status(400)
         .json({ success: false, error: "Please provide wallet address" });
     const user = await getUserByWalletAddress(walletAddress);
-    if (!user)
+    if (user.length === 0)
+      return res.status(404).json({ success: false, error: "User not found" });
+    res.status(200).json({ success: true, user });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const handleLogin = async (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password)
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "Please provide username and password",
+        });
+    const user = await loginUser(username, password);
+    if (user.length === 0)
       return res.status(404).json({ success: false, error: "User not found" });
     res.status(200).json({ success: true, user });
   } catch (error: any) {
@@ -100,5 +120,6 @@ userRouter.get("/:username", handleGetUserByUsername);
 userRouter.put("/:id", handleUpdateUserById);
 userRouter.delete("/:id", handleDeleteUserById);
 userRouter.get("/wallet/:walletAddress", handleGetUserByWalletAddress);
+userRouter.post("/login", handleLogin);
 
 export default userRouter;

@@ -15,6 +15,15 @@ const UserSchema = new mongoose.Schema({
     required: [true, "Please provide a wallet address"],
     unique: true,
   },
+  balance: {
+    type: [
+      {
+        user: String,
+        amount: Number,
+      },
+    ],
+    default: [],
+  },
 });
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);
