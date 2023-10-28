@@ -1,14 +1,20 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import connectDB from "./src/utils/connectDB";
+import userRouter from "./src/user/user.routes";
 dotenv.config();
 const port = process.env.PORT;
 const app: Express = express();
 connectDB();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+  res.send("Hello World!");
 });
+
+app.use("/api/users", userRouter);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
