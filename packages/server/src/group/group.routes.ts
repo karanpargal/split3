@@ -12,12 +12,12 @@ import { Request, Response, Router } from "express";
 
 const handleCreateGroup = async (req: Request, res: Response) => {
   try {
-    const { name, username } = req.body;
-    if (!name || !username)
+    const { groupName, username } = req.body;
+    if (!groupName || !username)
       return res
         .status(400)
-        .json({ error: "Please provide a name and username" });
-    const group = await createGroup(name, username);
+        .json({ error: "Please provide a group name and username" });
+    const group = await createGroup(groupName, username);
     res.status(201).json({ success: true, group });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
